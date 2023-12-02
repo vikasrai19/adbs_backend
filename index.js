@@ -84,7 +84,7 @@ app.post('/web/api/addAcademicYear', (req, res) => {
         } else {
           if (rows.length > 0) {
             console.log("Data already exists");
-            res.status(200).json({ "message": "Data already exists" });
+            res.status(4000).json({ "message": "Data already exists" });
           } else {
             db.query('INSERT INTO academicyear (academicyear_id, academicyear, orderNo) VALUES (?, ?, ?)', [acId, academicYear, orderNo], (err, result) => {
               if (err) {
@@ -124,7 +124,7 @@ app.post('/web/api/adddesignation', (req, res) => {
         } else {
           if (rows.length > 0) {
             console.log("Data already exists");
-            res.status(200).json({ "message": "Data already exists" });
+            res.status(400).json({ "message": "Data already exists" });
           } else {
             db.query('INSERT INTO designation ( designation_id,designation, orderNo) VALUES (?, ?, ?)', [ 	acId,designation, orderNo], (err, result) => {
               if (err) {
@@ -158,7 +158,7 @@ app.post('/web/api/addboarding', (req, res) => {
       } else {
               if (rows.length > 0) {
               console.log("Data already exists");
-              res.status(200).json({ "message": "Data already exists" });
+              res.status(400).json({ "message": "Data already exists" });
          }  else {
           db.query('INSERT INTO boardingpoints(BoardingPointid,BoardingPointName,BoardingPointNo) VALUES (?, ?, ?)', [acId,BoardingPointName,BoardingPointNo], (err, result) => {
            if (err) {
