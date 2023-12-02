@@ -172,6 +172,44 @@ app.post('/web/api/addboarding', (req, res) => {
 });
 })
 
+app.get('/web/api/academicyear', (req, res) => {
+  db.query('select * from academicyear', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/designation', (req, res) => {
+  db.query('select * from designation', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/boardingpoints', (req, res) => {
+  db.query('select * from boardingpoints', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
+
+
+
 
 
 app.listen(port, () => {
