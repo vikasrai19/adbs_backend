@@ -3,6 +3,7 @@ const login = require('./utils/login')
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
+const cors = require('cors');
 
 
 //const flash = require('connect-flash');
@@ -10,6 +11,7 @@ const crypto = require('crypto');
 //const validator = require('express-validator');
 
 const app = express();
+app.use(cors())
 app.use(bodyParser.json({ extended: false }));
 const port = 3000;
 
