@@ -209,6 +209,37 @@ app.post('/web/api/addbus', (req, res) => {
 });
 })
 
+app.post('/web/api/addstudent', (req, res) => {
+  const {usn,name,email,mobileno,busNo,stdImage,password,userId } = req.body;
+  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) =>{
+    if(er){
+      res.status(400).json({ "message": "Invalid user" });
+    }
+    if(rw.length === 0){
+      res.status(400).json({ "message": "Invalid user" });
+    }else{
+         db.query('SELECT * FROM student WHERE usn = ? OR name= ? OR email = ? OR mobileno= ? OR busNO= ? OR stdImage= ? OR password = ?', [ usn,name,email,mobileno,busNo,stdImage,password], (err, rows) => {
+       if (err) {
+       res.status(400).send(err.message);
+      } else {
+              if (rows.length > 0) {
+              console.log("Data already exists");
+              res.status(400).json({ "message": "Data already exists" });
+         }  else {
+          db.query('INSERT INTO student(usn,name,email,mobileno,busNo,stdImage,password) VALUES (?, ?, ?, ?, ?, ?, ?)', [usn,name,email,mobileno,busNo,stdImage,password], (err, result) => {
+           if (err) {
+             res.status(400).send(err.message);
+           } else {
+             res.status(200).json({ "message": "Data inserted successfully" });
+           }
+         });
+       }
+     }
+  });
+}
+});
+})
+
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
     if(err){
