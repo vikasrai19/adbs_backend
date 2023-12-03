@@ -84,11 +84,11 @@ app.post('/web/api/addAcademicYear', (req, res) => {
         } else {
           if (rows.length > 0) {
             console.log("Data already exists");
-            res.status(4000).json({ "message": "Data already exists" });
+            res.status(400).json({ "message": "Data already exists" });
           } else {
             db.query('INSERT INTO academicyear (academicyear_id, academicyear, orderNo) VALUES (?, ?, ?)', [acId, academicYear, orderNo], (err, result) => {
               if (err) {
-                res.status(500).send(err.message);
+                res.status(400).send(err.message);
               } else {
                 res.status(200).json({ "message": "Data inserted successfully" });
               }
@@ -162,15 +162,50 @@ app.post('/web/api/addboarding', (req, res) => {
          }  else {
           db.query('INSERT INTO boardingpoints(BoardingPointid,BoardingPointName,BoardingPointNo) VALUES (?, ?, ?)', [acId,BoardingPointName,BoardingPointNo], (err, result) => {
            if (err) {
-             result.status(400).send(err.message);
+             res.status(400).send(err.message);
            } else {
-             result.status(200).json({ "message": "Data inserted successfully" });
+             res.status(200).json({ "message": "Data inserted successfully" });
            }
          });
        }
      }
   });
 }
+});
+})
+
+//add bus is still on work donot refer this end point
+app.post('/web/api/addbus', (req, res) => {
+  const {busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats,userId } = req.body;
+  const acId = crypto.randomUUID()
+  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) =>{
+    if(er){
+      res.status(400).json({ "message": "Invalid user" });
+    }
+    if(rw.length === 0){
+      res.status(400).json({ "message": "Invalid user" });
+    }else{
+      db.query('SELECT * FROM collegebus WHERE busNo = ? OR routeNo = ? OR regDate = ? OR purchaseDate = ? OR startingPoint = ? OR endingPoint = ? OR noOfSeats = ?', [busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats], (err, rows) => {
+        if (err) {
+          res.status(400).send(err.message);
+        } else {
+          if (rows.length > 0) {
+            console.log("Data already exists");
+            res.status(400).json({ "message": "Data already exists" });
+          } else {
+            db.query('INSERT INTO collegebus (collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats,) VALUES (?, ?, ?, ? , ? ,?,?)', [ 	acId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats], (err, result) => {
+              if (err) {
+                res.status(400).send(err.message);
+              } else {
+                res.status(200).json({ "message": "Data inserted successfully" });
+              }
+            });
+          }
+        }
+     });
+    }
+  
+  
 });
 })
 
@@ -186,7 +221,7 @@ app.get('/web/api/academicyear', (req, res) => {
   })
 })
 
-app.get('/web/api/designation', (req, res) => {
+    app.get('/web/api/designation', (req, res) => {
   db.query('select * from designation', (err, result, fields) => {
     if(err){
       res.status(400).json({
