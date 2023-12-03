@@ -276,6 +276,29 @@ app.get('/web/api/boardingpoints', (req, res) => {
   })
 })
 
+app.get('/web/api/colegebus', (req, res) => {
+  db.query('select * from collegebus', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/student', (req, res) => {
+  db.query('select * from student', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
 
 
 
