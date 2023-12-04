@@ -248,6 +248,7 @@ app.post('/web/api/addstudent', (req, res) => {
 });
 })
 
+
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
     if(err){
@@ -298,6 +299,18 @@ app.get('/web/api/colegebus', (req, res) => {
 
 app.get('/web/api/student', (req, res) => {
   db.query('select * from student', (err, result, fields) => {
+    if(err){
+      res.status(400).json({
+        'message': err.message,
+      })
+    }else{
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/users', (req, res) => {
+  db.query('select * from users', (err, result, fields) => {
     if(err){
       res.status(400).json({
         'message': err.message,
