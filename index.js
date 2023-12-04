@@ -193,7 +193,7 @@ app.post('/web/api/addbus', (req, res) => {
             console.log("Data already exists");
             res.status(400).json({ "message": "Data already exists" });
           } else {
-            db.query('INSERT INTO collegebus (collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats,) VALUES (?, ?, ?, ? , ? ,?,?)', [ 	acId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats], (err, result) => {
+            db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats) VALUES (?, ?, ?, ? , ? ,?, ?, ?)', [ acId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats], (err, result) => {
               if (err) {
                 res.status(400).send(err.message);
               } else {
@@ -210,7 +210,7 @@ app.post('/web/api/addbus', (req, res) => {
 })
 
 app.post('/web/api/addstudent', (req, res) => {
-  const {usn,name,email,mobileno,busNo,stdImage,password,userId } = req.body;
+  const {userImage,name,email,mobileno,userId, academicYearId, boardingPointId,password, seatNo,busNo } = req.body;
   db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) =>{
     if(er){
       res.status(400).json({ "message": "Invalid user" });
@@ -218,24 +218,32 @@ app.post('/web/api/addstudent', (req, res) => {
     if(rw.length === 0){
       res.status(400).json({ "message": "Invalid user" });
     }else{
-         db.query('SELECT * FROM student WHERE usn = ? OR name= ? OR email = ? OR mobileno= ? OR busNO= ? OR stdImage= ? OR password = ?', [ usn,name,email,mobileno,busNo,stdImage,password], (err, rows) => {
-       if (err) {
-       res.status(400).send(err.message);
-      } else {
-              if (rows.length > 0) {
-              console.log("Data already exists");
-              res.status(400).json({ "message": "Data already exists" });
-         }  else {
-          db.query('INSERT INTO student(usn,name,email,mobileno,busNo,stdImage,password) VALUES (?, ?, ?, ?, ?, ?, ?)', [usn,name,email,mobileno,busNo,stdImage,password], (err, result) => {
-           if (err) {
-             res.status(400).send(err.message);
-           } else {
-             res.status(200).json({ "message": "Data inserted successfully" });
-           }
-         });
-       }
-     }
-  });
+      db.query('select userId from users where email = ?', [email], (userErr, userRows) =>{
+        if(userErr){
+          res.status(400).json({'message': userErr.message})
+        }else{
+          if(userRows.length > 0){
+            res.status(400).json({'message': 'Student already found'})
+          }else{
+            const newUserId = crypto.randomUUID()
+            const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
+            db.query('insert into users (userId, name, mobileno, busNo, email, password,userImage, usertype_id) values(?, ?, ?, ?, ?,?, ?, ?)', [newUserId, name, mobileno,busNo , email, password,userImage, studentUserType], (stuErr, stuRow) => {
+              if(stuErr){
+                res.status(400).json({'message': stuErr.message})
+              }/*else{
+                const collegeBusUserId = crypto.randomUUID()
+                db.query('insert into collegebususers (collegeBusUserId, user, busBoardingPointId, academiceyearId,seatNo) values(?, ?, ?, ?, ?)', [collegeBusUserId, newUserId, boardingPointId, academicYearId, seatNo], (clgBusErr, clgBusRows) => {
+                  if(clgBusErr){
+                    res.status(400).json({message: clgBusErr.message})
+                  }else{
+                    res.status(201).json({message: 'Student added successfully'})
+                  }
+                })
+              }*/
+            })
+          }
+        }
+      })
 }
 });
 })
