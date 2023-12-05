@@ -386,7 +386,7 @@ app.get('/web/api/boardingpointcount', (req, res) => {
   })
 })
 
-
+//end dashboard contents
 
 app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);
