@@ -248,6 +248,42 @@ app.post('/web/api/addstudent', (req, res) => {
   });
 })
 
+app.post('/web/api/busboardingpoints', (req, res) => {
+  const {boardingTime,dropTime,userId} = req.body;
+  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
+    if (er) {
+      res.status(400).json({ "message": "Invalid user" });
+    }
+    if (rw.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      db.query('SELECT * FROM busboardingpoints WHERE boardingTime = ? OR	dropTime = ?', [boardingTime, dropTime], (err, rows) => {
+        if (err) {
+          res.status(400).send(err.message);
+        } else {
+          if (rows.length > 0) {
+            console.log("Data already exists");
+            res.status(400).json({ "message": "Data already exists" });
+          } else {
+            const acId = crypto.randomUUID()
+             const bp="3a976c5d88354918b3733511fe837216";
+             const ci="37902748ffbe47969";
+             const ac="6bc54b4e35b249e3964cf5d11970a685";
+            db.query('INSERT INTO busboardingpoints(busBoardingPointId,collegeBusId,academicyearId,boardingPointId,boardingTime,dropTime) VALUES (?, ?, ?,?,?,?)', [acId,ci,ac,bp,boardingTime,dropTime], (err, result) => {
+              if (err) {
+                res.status(400).send(err.message);
+              } else {
+                res.status(200).json({ "message": "Data inserted successfully" });
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+})
+
+
 
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
