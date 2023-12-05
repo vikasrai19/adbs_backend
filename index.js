@@ -335,8 +335,58 @@ app.get('/web/api/users', (req, res) => {
   })
 })
 
+//dashboard contents
+app.get('/web/api/drivercount', (req, res) => {
+  const driverUserType = '23ecf27394504c9583aebb614ba10510';
+  db.query('select count(usertype_id) as drivers from users where usertype_id=?',  [driverUserType], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
 
+app.get('/web/api/busescount', (req, res) => {
+  db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
 
+app.get('/web/api/studentscount', (req, res) => {
+  const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
+  db.query('select count(usertype_id) as students from users where usertype_id=?',  [studentUserType], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/boardingpointcount', (req, res) => {
+  db.query('select count(BoardingPointid) as points from boardingpoints',(err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+//end dashboard contents
 
 app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);
