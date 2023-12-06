@@ -484,8 +484,6 @@ app.get('/web/api/drivercount', (req, res) => {
     }
   })
 })
-<<<<<<< HEAD
-=======
 
 app.get('/web/api/busescount', (req, res) => {
   db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
@@ -535,46 +533,8 @@ app.get('/web/api/busemployee', (req, res) => {
     }
   })
 })
->>>>>>> 3999a3f882332c4dde4ae328c85141c1ef4c9557
 
-app.get('/web/api/busescount', (req, res) => {
-  db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      })
-    } else {
-      res.status(200).json(result)
-    }
-  })
-})
 
-app.get('/web/api/studentscount', (req, res) => {
-  const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
-  db.query('select count(usertype_id) as students from users where usertype_id=?',  [studentUserType], (err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      })
-    } else {
-      res.status(200).json(result)
-    }
-  })
-})
-
-app.get('/web/api/boardingpointcount', (req, res) => {
-  db.query('select count(BoardingPointid) as points from boardingpoints',(err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      })
-    } else {
-      res.status(200).json(result)
-    }
-  })
-})
-
-//end dashboard contents
 
 //end dashboard contents
 
