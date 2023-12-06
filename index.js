@@ -285,7 +285,7 @@ app.post('/web/api/busboardingpoints', (req, res) => {
 
 
 app.post('/web/api/addbusemployee', (req, res) => {
-  const {collegeBusId,designationId,userId, startDate,endDate,phono,currentStatus} = req.body;
+  const {collegeBusId,designationId,userId,name,startDate,endDate,phono,currentStatus,empimg} = req.body;
   db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
     if (er) {
       res.status(400).json({ "message": "Invalid user" });
@@ -302,7 +302,7 @@ app.post('/web/api/addbusemployee', (req, res) => {
             res.status(400).json({ "message": "Data already exists" });
           } else {
             const acId = crypto.randomUUID()
-            db.query('INSERT INTO collegebusemployee(collegeBusDetailsId ,collegeBusId,userId,designationId,startDate,endDate,phono,currentStatus) VALUES (?, ?, ?,?,?,?,?,?)', [acId,collegeBusId,userId,designationId,startDate,endDate,phono,currentStatus], (err, result) => {
+            db.query('INSERT INTO collegebusemployee(collegeBusEmpId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus) VALUES (?, ?, ?,?,?,?,?,?,?)', [acId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus], (err, result) => {
               if (err) {
                 res.status(400).send(err.message);
               } else {
@@ -348,10 +348,12 @@ app.post('/web/api/updatestudent', (req, res) => {
 
 
 
+
+
 app.post('/web/api/dltstudent', (req, res) => {
   const { userId, usertype_id } = req.body;
   
-  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
+     db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
     if (err || rows.length === 0) {
       res.status(400).json({ "message": "Invalid user" });
     } else {
@@ -379,10 +381,64 @@ app.post('/web/api/dltstudent', (req, res) => {
   });
 });
 
+app.post('/web/api/updatedriver', (req, res) => {
+  const {collegeBusEmpId,name,phono,empimg,designation_id} = req.body;
+  db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].designation_id;
 
+      if (userTypeDB !== designation_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
+          [name, phono,empimg,collegeBusEmpId],
+          (stuErr, stuRow) => {
+            if (stuErr) {
+              res.status(400).json({ 'message': stuErr.message });
+            } else {
+              console.log('Student details updated successfully.');
+              res.status(200).json({ 'message': 'Student details updated successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
 
+app.post('/web/api/dltemp', (req, res) => {
+  const { collegeBusEmpId , designationId } = req.body;
+  
+     db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].designation_id;
 
-
+      if (userTypeDB !== designationId) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'DELETE FROM collegebusemployee  WHERE collegeBusEmpId  = ?',
+          [collegeBusEmpId ],
+          (delErr, delResult) => {
+            if (delErr) {
+              res.status(400).json({ 'message': delErr.message });
+            } else if (delResult.affectedRows === 0) {
+              res.status(404).json({ 'message': 'college bus employee not found' });
+            } else {
+              console.log('Student deleted successfully.');
+              res.status(200).json({ 'message': 'college bus employee deleted successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
 
 
 app.get('/web/api/academicyear', (req, res) => {
