@@ -248,6 +248,142 @@ app.post('/web/api/addstudent', (req, res) => {
   });
 })
 
+app.post('/web/api/busboardingpoints', (req, res) => {
+  const {boardingTime,dropTime,userId, boardingPointId, collegeBusId, academicYearId} = req.body;
+  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
+    if (er) {
+      res.status(400).json({ "message": "Invalid user" });
+    }
+    if (rw.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      db.query('SELECT * FROM busboardingpoints WHERE collegeBusId = ? OR	academicyearId= ? OR boardingPointId= ?', [collegeBusId, academicYearId,boardingPointId], (err, rows) => {
+        if (err) {
+          res.status(400).send(err.message);
+        } else {
+          if (rows.length > 0) {
+            console.log("Data already exists");
+            res.status(400).json({ "message": "Data already exists" });
+          } else {
+            const acId = crypto.randomUUID()
+            db.query('INSERT INTO busboardingpoints(busBoardingPointId,collegeBusId,academicyearId,boardingPointId,boardingTime,dropTime) VALUES (?, ?, ?,?,?,?)', [acId,collegeBusId,academicYearId,boardingPointId,boardingTime,dropTime], (err, result) => {
+              if (err) {
+                res.status(400).send(err.message);
+              } else {
+                res.status(200).json({ "message": "Data inserted successfully" });
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+})
+
+
+
+
+
+app.post('/web/api/addbusemployee', (req, res) => {
+  const {collegeBusId,designationId,userId, startDate,endDate,phono,currentStatus} = req.body;
+  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
+    if (er) {
+      res.status(400).json({ "message": "Invalid user" });
+    }
+    if (rw.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      db.query('SELECT * FROM  collegebusemployee  WHERE collegeBusId = ? OR phono = ?', [collegeBusId,phono], (err, rows) => {
+        if (err) {
+          res.status(400).send(err.message);
+        } else {
+          if (rows.length > 0) {
+            console.log("Data already exists");
+            res.status(400).json({ "message": "Data already exists" });
+          } else {
+            const acId = crypto.randomUUID()
+            db.query('INSERT INTO collegebusemployee(collegeBusDetailsId ,collegeBusId,userId,designationId,startDate,endDate,phono,currentStatus) VALUES (?, ?, ?,?,?,?,?,?)', [acId,collegeBusId,userId,designationId,startDate,endDate,phono,currentStatus], (err, result) => {
+              if (err) {
+                res.status(400).send(err.message);
+              } else {
+                res.status(200).json({ "message": "Data inserted successfully" });
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+})
+
+
+app.post('/web/api/updatestudent', (req, res) => {
+  const { userImage, name, email, mobileno, password, busNo, userId, usertype_id } = req.body;
+  
+  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].usertype_id;
+
+      if (userTypeDB !== usertype_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'UPDATE users SET name=?, mobileno=?, busNo=?, email=?, password=?, userImage=? WHERE userId = ?',
+          [name, mobileno, busNo, email, password, userImage, userId],
+          (stuErr, stuRow) => {
+            if (stuErr) {
+              res.status(400).json({ 'message': stuErr.message });
+            } else {
+              console.log('Student details updated successfully.');
+              res.status(200).json({ 'message': 'Student details updated successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+
+
+app.post('/web/api/dltstudent', (req, res) => {
+  const { userId, usertype_id } = req.body;
+  
+  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].usertype_id;
+
+      if (userTypeDB !== usertype_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'DELETE FROM users WHERE userId = ?',
+          [userId],
+          (delErr, delResult) => {
+            if (delErr) {
+              res.status(400).json({ 'message': delErr.message });
+            } else if (delResult.affectedRows === 0) {
+              res.status(404).json({ 'message': 'User not found' });
+            } else {
+              console.log('Student deleted successfully.');
+              res.status(200).json({ 'message': 'Student deleted successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+
+
+
+
+
 
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
@@ -348,6 +484,8 @@ app.get('/web/api/drivercount', (req, res) => {
     }
   })
 })
+<<<<<<< HEAD
+=======
 
 app.get('/web/api/busescount', (req, res) => {
   db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
@@ -385,6 +523,58 @@ app.get('/web/api/boardingpointcount', (req, res) => {
     }
   })
 })
+
+app.get('/web/api/busemployee', (req, res) => {
+  db.query('select * from  collegebusemployee', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+>>>>>>> 3999a3f882332c4dde4ae328c85141c1ef4c9557
+
+app.get('/web/api/busescount', (req, res) => {
+  db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/studentscount', (req, res) => {
+  const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
+  db.query('select count(usertype_id) as students from users where usertype_id=?',  [studentUserType], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+app.get('/web/api/boardingpointcount', (req, res) => {
+  db.query('select count(BoardingPointid) as points from boardingpoints',(err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+//end dashboard contents
 
 //end dashboard contents
 
