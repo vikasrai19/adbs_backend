@@ -317,6 +317,73 @@ app.post('/web/api/addbusemployee', (req, res) => {
 })
 
 
+app.post('/web/api/updatestudent', (req, res) => {
+  const { userImage, name, email, mobileno, password, busNo, userId, usertype_id } = req.body;
+  
+  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].usertype_id;
+
+      if (userTypeDB !== usertype_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'UPDATE users SET name=?, mobileno=?, busNo=?, email=?, password=?, userImage=? WHERE userId = ?',
+          [name, mobileno, busNo, email, password, userImage, userId],
+          (stuErr, stuRow) => {
+            if (stuErr) {
+              res.status(400).json({ 'message': stuErr.message });
+            } else {
+              console.log('Student details updated successfully.');
+              res.status(200).json({ 'message': 'Student details updated successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+
+
+app.post('/web/api/dltstudent', (req, res) => {
+  const { userId, usertype_id } = req.body;
+  
+  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].usertype_id;
+
+      if (userTypeDB !== usertype_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'DELETE FROM users WHERE userId = ?',
+          [userId],
+          (delErr, delResult) => {
+            if (delErr) {
+              res.status(400).json({ 'message': delErr.message });
+            } else if (delResult.affectedRows === 0) {
+              res.status(404).json({ 'message': 'User not found' });
+            } else {
+              console.log('Student deleted successfully.');
+              res.status(200).json({ 'message': 'Student deleted successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+
+
+
+
+
 
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
@@ -454,6 +521,20 @@ app.get('/web/api/boardingpointcount', (req, res) => {
     }
   })
 })
+
+app.get('/web/api/busemployee', (req, res) => {
+  db.query('select * from  collegebusemployee', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
+
 
 //end dashboard contents
 
