@@ -1,16 +1,22 @@
-const login = (req, res) =>{
-    // const usn = req.body.usn;
-    // const name = req.body.name;
-    // const mobileNo = req.body.mobileNo;
-    // const busNo = req.body.busNo;
-    // const password = req.body.password;
+const login = (req, res, db) => {
+    const { email, password } = req.body;
+    db.query('SELECT * FROM users u,usertype t WHERE u.usertype_id=t.usertype_id and email = ? AND password = ? and t.usertype="Admin"', [email, password], (err, rows, fields) => {
+        if (err) res.status(400).send(err?.message);
 
-    // console.log('body ', req.body);
-   
-    // db.query('INSERT INTO student (userId,name, mobileno, busNo, password) VALUES (?, ?, ?, ?, ?)', [usn,name, mobileNo, busNo, password], (err, result) => {
-    //    if (err) throw err;
-    //    console.log(result);
-    //    res.send('User registration successful...');
-    // });
-    res.send('User registration successful...');
+        if (rows.length > 0) {
+            console.log(rows[0].name)
+            retData = {
+                userId: rows[0].userId,
+                usertype: rows[0].usertype_id,
+                name: rows[0].name,
+                email: rows[0].email,
+                mobileNo: rows[0].mobileno,
+            }
+            res.status(201).send(retData);
+        } else {
+            res.status(400).send('Invalid credentials. Please try again.');
+        }
+    })
 }
+
+module.exports = login

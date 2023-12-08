@@ -1,9 +1,16 @@
 const express = require('express')
-const login = require('./utils/login')
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
+
+const login = require('./utils/login')
+const { createAcademicYear } = require('./utils/academic_year')
+const { addDesignation } = require('./utils/designation')
+const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
+const { addBus } = require('./utils/bus')
+const { addStudent, updateStudent } = require('./utils/student')
+const { addBusEmployee } = require('./utils/employee')
 
 
 //const flash = require('connect-flash');
@@ -16,373 +23,54 @@ app.use(bodyParser.json({ extended: false }));
 const port = 3000;
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
+  host: '127.0.0.1',
+  user: 'vikas',
+  password: 'vikasrai',
   database: 'nittebuscheck'
 });
 
 db.connect((err) => {
-  if (err) throw err;
+  if (err) {
+
+    console.log('error ', err.message)
+    throw err;
+  };
   console.log('MySQL Connected...');
 });
 
 //  app.get('/login', (req, res) => {
 //   const { email, password } = req.query;
 
-app.post('/web/api/login', (req, res) => {
-  const { email, password } = req.body;
-  db.query('SELECT * FROM users u,usertype t WHERE u.usertype_id=t.usertype_id and email = ? AND password = ? and t.usertype="Admin"', [email, password], (err, rows, fields) => {
-    if (err) res.status(400).send(err?.message);
 
-    if (rows.length > 0) {
-      console.log(rows[0].name)
-      retData = {
-        userId: rows[0].userId,
-        usertype: rows[0].usertype_id,
-        name: rows[0].name,
-        email: rows[0].email,
-        mobileNo: rows[0].mobileno,
-      }
-      res.status(201).send(retData);
-    } else {
-      res.status(400).send('Invalid credentials. Please try again.');
-    }
-  })
-});
+app.post('/web/api/login', (req, res) => login(req, res, db));
 
-/*app.post('/web/api/addac', (req, res) => {
-   const {academicyear_id,academicyear, orderNo} = req.body;
-   db.query('SELECT * FROM academicyear WHERE academicyear_id= ?,academicyear = ? AND orderNo = ?', [academicyear_id,academicyear, orderNo], (err, rows, fields) => {
-    if (err) res.status(400).send(err?.message);
-    if (rows.length > 0) {
-      console.log("Already Created")}
-    else{
-      db.query('insert into academicyear(academicyear_id, academicyear,orderNo)values(?,?,?)');
-      db.query(sql, [academicyear_id, academicyear, orderNo], (err, result) => {
-        if (err) throw err;
+app.post('/web/api/addAcademicYear', (req, res) => createAcademicYear(req, res, db));
 
-        res.status(200).json({ "message": "Data inserted successfully" });
-     });
-    }
-  });
+app.post('/web/api/adddesignation', (req, res) => addDesignation(req, res, db));
 
-
-})*/
-app.post('/web/api/addAcademicYear', (req, res) => {
-  const { academicYear, orderNo, userId } = req.body;
-
-  const acId = crypto.randomUUID()
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-
-    } else {
-      db.query('SELECT * FROM academicyear WHERE academicyear = ? or orderNo = ?', [academicYear, orderNo], (err, rows, fields) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            db.query('INSERT INTO academicyear (academicyear_id, academicyear, orderNo) VALUES (?, ?, ?)', [acId, academicYear, orderNo], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
-  })
-
-
-});
-
-
-
-
-
-
-
-app.post('/web/api/adddesignation', (req, res) => {
-  const { designation, orderNo, userId } = req.body;
-  const acId = crypto.randomUUID()
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('SELECT * FROM  	designation WHERE designation = ? OR orderNo = ?', [designation, orderNo], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            db.query('INSERT INTO designation ( designation_id,designation, orderNo) VALUES (?, ?, ?)', [acId, designation, orderNo], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
-
-
-  });
-})
-
-app.post('/web/api/addboarding', (req, res) => {
-  const { BoardingPointName, BoardingPointNo, userId } = req.body;
-  const acId = crypto.randomUUID()
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('SELECT * FROM boardingpoints WHERE BoardingPointName = ? OR	BoardingPointNo = ?', [BoardingPointName, BoardingPointNo], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            db.query('INSERT INTO boardingpoints(BoardingPointid,BoardingPointName,BoardingPointNo) VALUES (?, ?, ?)', [acId, BoardingPointName, BoardingPointNo], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
-  });
-})
+app.post('/web/api/addboarding', (req, res) => addBoarding(req, res, db));
 
 //add bus is still on work donot refer this end point
-app.post('/web/api/addbus', (req, res) => {
-  const { busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, userId, busImage } = req.body;
-  const acId = crypto.randomUUID()
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('SELECT * FROM collegebus WHERE busNo = ? OR routeNo = ?', [busNo, routeNo], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats,busImage) VALUES (?, ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats,busImage], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
+app.post('/web/api/addbus', (req, res) => addBus(req, res, db));
 
+app.post('/web/api/addstudent', (req, res) => addStudent(req, res, db));
 
-  });
-})
+app.post('/web/api/busboardingpoints', (req, res) => addBusBoardingPoint(req, res, db));
 
-app.post('/web/api/addstudent', (req, res) => {
-  const { userImage, name, email, mobileno, userId, academicYearId, boardingPointId, password, seatNo, busNo, usn } = req.body;
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('select userId from users where email = ?', [email], (userErr, userRows) => {
-        if (userErr) {
-          res.status(400).json({ 'message': userErr.message })
-        } else {
-          if (userRows.length > 0) {
-            res.status(400).json({ 'message': 'Student already found' })
-          } else {
-            const newUserId = crypto.randomUUID()
-            const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
-            db.query('insert into users (userId,name, mobileno, busNo, email, password,userImage, usertype_id,usn) values(?, ?, ?, ?, ?,?, ?, ?,?)', [newUserId, name, mobileno, busNo, email, password, userImage, studentUserType, usn], (stuErr, stuRow) => {
-              if (stuErr) {
-                res.status(400).json({ 'message': stuErr.message })
-              }/*else{
-                const collegeBusUserId = crypto.randomUUID()
-                db.query('insert into collegebususers (collegeBusUserId, user, busBoardingPointId, academiceyearId,seatNo) values(?, ?, ?, ?, ?)', [collegeBusUserId, newUserId, boardingPointId, academicYearId, seatNo], (clgBusErr, clgBusRows) => {
-                  if(clgBusErr){
-                    res.status(400).json({message: clgBusErr.message})
-                  }else{
-                    res.status(201).json({message: 'Student added successfully'})
-                  }
-                })
-              }*/
-            })
-          }
-        }
-      })
-    }
-  });
-})
+app.post('/web/api/addbusemployee', (req, res) => addBusEmployee(req, res, db));
 
-app.post('/web/api/busboardingpoints', (req, res) => {
-  const {boardingTime,dropTime,userId, boardingPointId, collegeBusId, academicYearId} = req.body;
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('SELECT * FROM busboardingpoints WHERE collegeBusId = ? OR	academicyearId= ? OR boardingPointId= ?', [collegeBusId, academicYearId,boardingPointId], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            const acId = crypto.randomUUID()
-            db.query('INSERT INTO busboardingpoints(busBoardingPointId,collegeBusId,academicyearId,boardingPointId,boardingTime,dropTime) VALUES (?, ?, ?,?,?,?)', [acId,collegeBusId,academicYearId,boardingPointId,boardingTime,dropTime], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
-  });
-})
-
-
-
-
-
-app.post('/web/api/addbusemployee', (req, res) => {
-  const {collegeBusId,designationId,userId,name,startDate,endDate,phono,currentStatus,empimg} = req.body;
-  db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
-    if (er) {
-      res.status(400).json({ "message": "Invalid user" });
-    }
-    if (rw.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      db.query('SELECT * FROM  collegebusemployee  WHERE collegeBusId = ? OR phono = ?', [collegeBusId,phono], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            const acId = crypto.randomUUID()
-            db.query('INSERT INTO collegebusemployee(collegeBusEmpId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus) VALUES (?, ?, ?,?,?,?,?,?,?)', [acId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus], (err, result) => {
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
-              }
-            });
-          }
-        }
-      });
-    }
-  });
-})
-
-
-app.post('/web/api/updatestudent', (req, res) => {
-  const { userImage, name, email, mobileno, password, busNo, userId, usertype_id } = req.body;
-  
-  db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
-    if (err || rows.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      const userTypeDB = rows[0].usertype_id;
-
-      if (userTypeDB !== usertype_id) {
-        res.status(400).json({ "message": "Invalid user type" });
-      } else {
-        db.query(
-          'UPDATE users SET name=?, mobileno=?, busNo=?, email=?, password=?, userImage=? WHERE userId = ?',
-          [name, mobileno, busNo, email, password, userImage, userId],
-          (stuErr, stuRow) => {
-            if (stuErr) {
-              res.status(400).json({ 'message': stuErr.message });
-            } else {
-              console.log('Student details updated successfully.');
-              res.status(200).json({ 'message': 'Student details updated successfully.' });
-            }
-          }
-        );
-      }
-    }
-  });
-});
+app.post('/web/api/updatestudent', (req, res) => updateStudent(req, res, db));
 
 
 
 
 
 app.post('/web/api/dltstudent', (req, res) => {
-  const { userId, usertype_id } = req.body;
-  
-     db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
-    if (err || rows.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      const userTypeDB = rows[0].usertype_id;
 
-      if (userTypeDB !== usertype_id) {
-        res.status(400).json({ "message": "Invalid user type" });
-      } else {
-        db.query(
-          'DELETE FROM users WHERE userId = ?',
-          [userId],
-          (delErr, delResult) => {
-            if (delErr) {
-              res.status(400).json({ 'message': delErr.message });
-            } else if (delResult.affectedRows === 0) {
-              res.status(404).json({ 'message': 'User not found' });
-            } else {
-              console.log('Student deleted successfully.');
-              res.status(200).json({ 'message': 'Student deleted successfully.' });
-            }
-          }
-        );
-      }
-    }
-  });
 });
 
 app.post('/web/api/updatedriver', (req, res) => {
-  const {collegeBusEmpId,name,phono,empimg,designation_id} = req.body;
+  const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
   db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
     if (err || rows.length === 0) {
       res.status(400).json({ "message": "Invalid user" });
@@ -394,7 +82,7 @@ app.post('/web/api/updatedriver', (req, res) => {
       } else {
         db.query(
           'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
-          [name, phono,empimg,collegeBusEmpId],
+          [name, phono, empimg, collegeBusEmpId],
           (stuErr, stuRow) => {
             if (stuErr) {
               res.status(400).json({ 'message': stuErr.message });
@@ -410,9 +98,9 @@ app.post('/web/api/updatedriver', (req, res) => {
 });
 
 app.post('/web/api/dltemp', (req, res) => {
-  const { collegeBusEmpId , designationId } = req.body;
-  
-     db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, rows) => {
+  const { collegeBusEmpId, designationId } = req.body;
+
+  db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, rows) => {
     if (err || rows.length === 0) {
       res.status(400).json({ "message": "Invalid user" });
     } else {
@@ -423,7 +111,7 @@ app.post('/web/api/dltemp', (req, res) => {
       } else {
         db.query(
           'DELETE FROM collegebusemployee  WHERE collegeBusEmpId  = ?',
-          [collegeBusEmpId ],
+          [collegeBusEmpId],
           (delErr, delResult) => {
             if (delErr) {
               res.status(400).json({ 'message': delErr.message });
@@ -530,7 +218,7 @@ app.get('/web/api/users', (req, res) => {
 //dashboard contents
 app.get('/web/api/drivercount', (req, res) => {
   const driverUserType = '23ecf27394504c9583aebb614ba10510';
-  db.query('select count(usertype_id) as drivers from users where usertype_id=?',  [driverUserType], (err, result, fields) => {
+  db.query('select count(usertype_id) as drivers from users where usertype_id=?', [driverUserType], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -542,7 +230,7 @@ app.get('/web/api/drivercount', (req, res) => {
 })
 
 app.get('/web/api/busescount', (req, res) => {
-  db.query('select count(collegeBusId) as buses from collegebus',(err, result, fields) => {
+  db.query('select count(collegeBusId) as buses from collegebus', (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -555,7 +243,7 @@ app.get('/web/api/busescount', (req, res) => {
 
 app.get('/web/api/studentscount', (req, res) => {
   const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
-  db.query('select count(usertype_id) as students from users where usertype_id=?',  [studentUserType], (err, result, fields) => {
+  db.query('select count(usertype_id) as students from users where usertype_id=?', [studentUserType], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -567,7 +255,7 @@ app.get('/web/api/studentscount', (req, res) => {
 })
 
 app.get('/web/api/boardingpointcount', (req, res) => {
-  db.query('select count(BoardingPointid) as points from boardingpoints',(err, result, fields) => {
+  db.query('select count(BoardingPointid) as points from boardingpoints', (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
