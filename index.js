@@ -9,7 +9,7 @@ const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
 const { addBus } = require('./utils/bus')
-const { addStudent, updateStudent } = require('./utils/student')
+const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
 const { addBusEmployee,deleteBusEmployee } = require('./utils/employee')
 
 
@@ -50,26 +50,22 @@ app.post('/web/api/adddesignation', (req, res) => addDesignation(req, res, db));
 
 app.post('/web/api/addboarding', (req, res) => addBoarding(req, res, db));
 
-//add bus is still on work donot refer this end point
 app.post('/web/api/addbus', (req, res) => addBus(req, res, db));
+app.post('/web/api/addbusemployee', (req, res) => addBusEmployee(req, res, db));
 
-app.post('/web/api/addstudent', (req, res) => addStudent(req, res, db));
+app.post('/web/api/dltstudent', (req, res) => deleteStudent(req, res, db));
 
 app.post('/web/api/busboardingpoints', (req, res) => addBusBoardingPoint(req, res, db));
 
-app.post('/web/api/addbusemployee', (req, res) => addBusEmployee(req, res, db));
+app.post('/web/api/addstudent', (req, res) => addStudent(req, res, db));
+
+app.post('/web/api/deleteemployee', (req, res) => deleteBusEmployee(req, res, db));
+
+//add bus is still on work donot refer this end point
+
 
 app.post('/web/api/updatestudent', (req, res) => updateStudent(req, res, db));
 
-
-
-
-
-app.post('/web/api/dltstudent', (req, res) => {
-
-});
-
-app.post('/web/api/deleteemployee', (req, res) => deleteBusEmployee(req, res, db));
 
 app.post('/web/api/updatedriver', (req, res) => {
   const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
@@ -163,8 +159,8 @@ app.get('/web/api/student', (req, res) => {
 })
 
 app.get('/web/api/driver', (req, res) => {
-  const driverUserType = '23ecf27394504c9583aebb614ba10510';
-  db.query('select * from users where usertype_id=?', [driverUserType], (err, result, fields) => {
+  const designationId = 'b1832cb0c66246b493d72da60cd206d0';
+  db.query('select * from collegebusemployee where designationId=?', [designationId], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -270,3 +266,6 @@ app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);
 })
 
+//deletebus
+//updateemployee
+//update admin details

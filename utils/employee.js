@@ -36,12 +36,14 @@ const addBusEmployee = (req, res, db) => {
 }
 const deleteBusEmployee = (req, res, db) => {
   const { collegeBusEmpId, designationId } = req.body;
+  console.log(collegeBusEmpId)
 
   db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, rows) => {
     if (err || rows.length === 0) {
       res.status(400).json({ "message": "Invalid user" });
     } else {
       const userTypeDB = rows[0].designation_id;
+      const designationId='b1832cb0c66246b493d72da60cd206d0'
 
       if (userTypeDB !== designationId) {
         res.status(400).json({ "message": "Invalid user type" });

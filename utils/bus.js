@@ -31,4 +31,5 @@ const addBus = (req, res, db) => {
     });
 }
 
+  
 module.exports = { addBus }

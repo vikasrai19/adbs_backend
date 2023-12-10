@@ -69,12 +69,13 @@ const updateStudent = (req, res, db) => {
 }
 
 const deleteStudent = (req, res, db) => {
-    const { userId, usertype_id } = req.body;
-
+    const { userId } = req.body;
+console.log(userId)
     db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
         if (err || rows.length === 0) {
             res.status(400).json({ "message": "Invalid user" });
         } else {
+            const usertype_id='4317d1e47f6a45c39dacdad3b8c301f4'
             const userTypeDB = rows[0].usertype_id;
 
             if (userTypeDB !== usertype_id) {
