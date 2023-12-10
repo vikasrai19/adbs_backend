@@ -250,6 +250,18 @@ app.get('/web/api/busemployee', (req, res) => {
   })
 })
 
+app.get('/web/api/designation', (req, res) => {
+  db.query('select * from  designation', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
 
 
 //end dashboard contents

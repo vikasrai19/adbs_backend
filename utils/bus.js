@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const addBus = (req, res, db) => {
     const { busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, userId, busImage } = req.body;
     const acId = crypto.randomUUID()
