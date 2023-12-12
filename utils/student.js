@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 const addStudent = (req, res, db) => {
-    const { userImage, name, email, mobileno, userId, academicYearId, boardingPointId, password, seatNo, busNo, usn } = req.body;
+    const { userImage, name, email, mobileno, userId, password, busNo } = req.body;
     db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
         if (er) {
             res.status(400).json({ "message": "Invalid user" });
@@ -18,7 +18,7 @@ const addStudent = (req, res, db) => {
                     } else {
                         const newUserId = crypto.randomUUID()
                         const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
-                        db.query('insert into users (userId,name, mobileno, busNo, email, password,userImage, usertype_id,usn) values(?, ?, ?, ?, ?,?, ?, ?,?)', [newUserId, name, mobileno, busNo, email, password, userImage, studentUserType, usn], (stuErr, stuRow) => {
+                        db.query('insert into users (userId,name, mobileno, busNo, email, password,userImage, usertype_id) values(?, ?, ?, ?, ?,?, ?, ?)', [newUserId, name, mobileno, busNo, email, password, userImage, studentUserType], (stuErr, stuRow) => {
                             if (stuErr) {
                                 res.status(400).json({ 'message': stuErr.message })
                             }/*else{
@@ -69,12 +69,13 @@ const updateStudent = (req, res, db) => {
 }
 
 const deleteStudent = (req, res, db) => {
-    const { userId, usertype_id } = req.body;
-
+    const { userId } = req.body;
+console.log(userId)
     db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
         if (err || rows.length === 0) {
             res.status(400).json({ "message": "Invalid user" });
         } else {
+            const usertype_id='4317d1e47f6a45c39dacdad3b8c301f4'
             const userTypeDB = rows[0].usertype_id;
 
             if (userTypeDB !== usertype_id) {
