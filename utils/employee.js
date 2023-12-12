@@ -67,4 +67,34 @@ const deleteBusEmployee = (req, res, db) => {
   });
 };
 
-module.exports = { addBusEmployee, deleteBusEmployee }
+const updateBusEmployee = (req, res) => {
+  const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
+  db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
+    } else {
+      const userTypeDB = rows[0].designation_id;
+
+      if (userTypeDB !== designation_id) {
+        res.status(400).json({ "message": "Invalid user type" });
+      } else {
+        db.query(
+          'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
+          [name, phono, empimg, collegeBusEmpId],
+          (stuErr, stuRow) => {
+            if (stuErr) {
+              res.status(400).json({ 'message': stuErr.message });
+            } else {
+              console.log('Student details updated successfully.');
+              res.status(200).json({ 'message': 'Student details updated successfully.' });
+            }
+          }
+        );
+      }
+    }
+  });
+};
+
+
+
+module.exports = { addBusEmployee, deleteBusEmployee,updateBusEmployee }

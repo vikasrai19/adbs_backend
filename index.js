@@ -8,9 +8,9 @@ const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
-const { addBus } = require('./utils/bus')
+const { addBus,deleteBus } = require('./utils/bus')
 const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
-const { addBusEmployee,deleteBusEmployee } = require('./utils/employee')
+const { addBusEmployee,deleteBusEmployee,updateBusEmployee } = require('./utils/employee')
 
 
 //const flash = require('connect-flash');
@@ -65,37 +65,9 @@ app.post('/web/api/deleteemployee', (req, res) => deleteBusEmployee(req, res, db
 
 
 app.post('/web/api/updatestudent', (req, res) => updateStudent(req, res, db));
+app.post('/web/api/updateemployee', (req, res) => updateBusEmployee(req, res, db));
 
-
-app.post('/web/api/updatedriver', (req, res) => {
-  const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
-  db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
-    if (err || rows.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
-    } else {
-      const userTypeDB = rows[0].designation_id;
-
-      if (userTypeDB !== designation_id) {
-        res.status(400).json({ "message": "Invalid user type" });
-      } else {
-        db.query(
-          'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
-          [name, phono, empimg, collegeBusEmpId],
-          (stuErr, stuRow) => {
-            if (stuErr) {
-              res.status(400).json({ 'message': stuErr.message });
-            } else {
-              console.log('Student details updated successfully.');
-              res.status(200).json({ 'message': 'Student details updated successfully.' });
-            }
-          }
-        );
-      }
-    }
-  });
-});
-
-
+app.post('/web/api/deletebus', (req, res) => deleteBus(req, res, db));
 
 app.get('/web/api/academicyear', (req, res) => {
   db.query('select * from academicyear', (err, result, fields) => {
