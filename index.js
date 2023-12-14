@@ -8,9 +8,12 @@ const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
-const { addBus,deleteBus } = require('./utils/bus')
+const { addBus, deleteBus } = require('./utils/bus')
 const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
-const { addBusEmployee,deleteBusEmployee,updateBusEmployee } = require('./utils/employee')
+const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./utils/employee')
+
+const { mobileLogin } = require('./utils/mobile_utils/mobile_login')
+const { mobileDashboardUser } = require('./utils/mobile_utils/mobile_dashboard')
 
 
 //const flash = require('connect-flash');
@@ -23,9 +26,9 @@ app.use(bodyParser.json({ extended: false }));
 const port = 3000;
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
+  host: '127.0.0.1',
+  user: 'vikas',
+  password: 'vikasrai',
   database: 'nittebuscheck'
 });
 
@@ -233,6 +236,13 @@ app.get('/web/api/designation', (req, res) => {
 
 
 //end dashboard contents
+
+
+
+// Mobile backend contents
+app.post('/mobile/api/login', (req, res) => mobileLogin(req, res, db));
+
+app.get('/mobile/api/users/dashboard', (req, res) => mobileDashboardUser(req, res, db));
 
 app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);

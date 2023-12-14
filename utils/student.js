@@ -1,7 +1,9 @@
 const crypto = require('crypto')
 
 const addStudent = (req, res, db) => {
-    const { userImage, name, email, mobileno, userId, password, busNo } = req.body;
+    const { userImage, name, email, mobileno, userId, password, busNo, busBoardingPointId, academicYearId, seatNo } = req.body;
+
+    console.log(req.body);
     db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
         if (er) {
             res.status(400).json({ "message": "Invalid user" });
@@ -21,7 +23,19 @@ const addStudent = (req, res, db) => {
                         db.query('insert into users (userId,name, mobileno, busNo, email, password,userImage, usertype_id) values(?, ?, ?, ?, ?,?, ?, ?)', [newUserId, name, mobileno, busNo, email, password, userImage, studentUserType], (stuErr, stuRow) => {
                             if (stuErr) {
                                 res.status(400).json({ 'message': stuErr.message })
-                            }/*else{
+                            }else{
+                                const collegeBusUserId = crypto.randomUUID();
+                                db.query('insert into collegebususers (collegeBusUserId, user, busBoardingPointId, academicYearId, seatNo) values(?, ?, ?, ?, ?)', [collegeBusUserId, newUserId, busBoardingPointId, academicYearId, seatNo], (clgBusErr, clgBusRows, _) => {
+                                    if(clgBusErr){
+                                        res.status(400).json({'message': clgBusErr.message});
+                                    }else{
+                                        res.status(201).json({'message': 'Successfully added student to the bus'});
+                                    }
+                                })
+                            }
+
+
+                            /*else{
                 const collegeBusUserId = crypto.randomUUID()
                 db.query('insert into collegebususers (collegeBusUserId, user, busBoardingPointId, academiceyearId,seatNo) values(?, ?, ?, ?, ?)', [collegeBusUserId, newUserId, boardingPointId, academicYearId, seatNo], (clgBusErr, clgBusRows) => {
                   if(clgBusErr){

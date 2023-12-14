@@ -1,6 +1,6 @@
 const mobileLogin = (req, res, db) => {
     const { email, password } = req.body;
-    db.query('SELECT * FROM users u,usertype t WHERE u.usertype_id=t.usertype_id and email = ? AND password = ? and t.usertype in ("Student")', [email, password], (err, rows, fields) => {
+    db.query('SELECT * FROM users u,usertype t WHERE u.usertype_id=t.usertype_id and u.email = ? AND u.password = ? and t.usertype in ("student", "Staff")', [email, password], (err, rows, fields) => {
         if (err) {
             res.status(400).json({ 'message': err?.message });
         } else {

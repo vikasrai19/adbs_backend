@@ -1,6 +1,7 @@
-const MobileDashboardUser = (req, res, db) => {
-    const { userId } = req.body;
-    db.query('select * from busboardingpoints bbp inner join collegebususers cbu on cbu.busBoardingPointId = bbp.busBoardingPointId inner join collegebus cb on cb.collegeBusId = bbp.collegeBusId inner join Users u on u.userId = user where u.userId = ?', [userId], (err, rows, fields) => {
+const mobileDashboardUser = (req, res, db) => {
+    const { userId } = req.query;
+    console.log("user id ", userId)
+    db.query('select * from users u, collegebususers cbu, busboardingpoints bbp, collegebus cb where cb.collegeBusId = bbp.collegeBusId and cbu.user = u.userId and bbp.busBoardingPointId = cbu.busBoardingPointId and userId = ?', [userId], (err, rows, fields) => {
         if (err) {
             res.status(400).json({ 'message': err?.message });
         } else {
@@ -8,18 +9,26 @@ const MobileDashboardUser = (req, res, db) => {
                 res.status(400).json({ 'message': 'No Data found' });
             } else {
                 console.log('data ', rows)
+                let data = rows[0];
                 let retData = {
-
+                    busNo: data?.busNo,
+                    seatNo: data?.seatNo,
+                    boardingPointId: data?.boardingPointId,
+                    boardingTime: data?.boardingTime,
+                    staringPoint: data?.startingPoint,
+                    endingPoint: data?.endingPoint,
+                    routeNo: data?.routeNo,
+                    boardingTime: data?.boardingTime,
                 }
-                res.status(200).json({ 'message': 'Successfully got some data' })
+                res.status(200).json(retData)
             }
         }
     })
 
 }
 
-const MobileDashboardDriver = (req, res, db) => {
+const mobileDashboardDriver = (req, res, db) => {
 
 }
 
-module.exports = { MobileDashboardUser, MobileDashboardDriver }
+module.exports = { mobileDashboardDriver, mobileDashboardUser }
