@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 const addBusEmployee = (req, res, db) => {
-  const { collegeBusId, designationId, userId, name, startDate, endDate, phono, currentStatus, empimg } = req.body;
+  const { collegeBusId, designationId, userId, name, startDate, endDate, phono, currentStatus, empimg,email,password,userTypeId } = req.body;
   console.log(req.body);
   db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
     if (er) {
@@ -10,27 +10,63 @@ const addBusEmployee = (req, res, db) => {
     if (rw.length === 0) {
       res.status(400).json({ "message": "Invalid user" });
     } else {
-      db.query('SELECT * FROM  collegebusemployee  WHERE collegeBusId = ? OR phono = ?', [collegeBusId, phono], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-        } else {
-          if (rows.length > 0) {
-            console.log("Data already exists");
-            res.status(400).json({ "message": "Data already exists" });
-          } else {
-            const acId = crypto.randomUUID()
-            // let data = 
-            db.query('INSERT INTO collegebusemployee(collegeBusEmpId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus) VALUES (?, ?, ?,?,?,?,?,?,?)', [acId, name, collegeBusId, designationId, startDate, endDate, phono, empimg, currentStatus], (err, result) => {
-              // console.log(data)
-              if (err) {
-                res.status(400).send(err.message);
-              } else {
-                res.status(200).json({ "message": "Data inserted successfully" });
+            db.query('select userId from users where email=? OR mobileno=?',[email,password],(err,rw1,f1)=>{
+              if(err){
+                res.status(400).json({"message":err.message});
               }
-            });
-          }
-        }
-      });
+              else{
+                if (rw1.length>0) {
+                  res.status(400).json({ "message": "employee already presented"});
+                }
+                else{
+                const acId = crypto.randomUUID()
+                db.query('insert into users (userId,name, mobileno, email, password,userImage, usertype_id) values(?, ?, ?, ?, ?,?, ?)', [acId, name,phono, email, password, empimg, userTypeId], (usrErr, usrRow) => {
+                  if(usrErr){
+                    res.status(400).json({"message":usrErr.message});
+                  }
+                  else{
+                    const emid = crypto.randomUUID()
+                    db.query('INSERT INTO collegebusemployee(collegeBusEmpId,collegeBusId,designationId,startDate,endDate,currentStatus,userId) VALUES (?, ?, ?,?,?,?,?)', [emid,collegeBusId, designationId, startDate, endDate, currentStatus,acId], (emperr, empresult) => {
+                      if(emperr){
+                        res.status(400).json({"message":emperr.message});
+                      }
+                      else{
+                        res.status(200).json({ "message": "employee inserted successfully"});
+                      }
+
+
+                    })
+                  }
+
+                })
+                }
+
+              }
+
+
+            })
+
+      // db.query('SELECT * FROM  collegebusemployee  WHERE collegeBusId = ? OR phono = ?', [collegeBusId, phono], (err, rows) => {
+      //   if (err) {
+      //     res.status(400).send(err.message);
+      //   } else {
+      //     if (rows.length > 0) {
+      //       console.log("Data already exists");
+      //       res.status(400).json({ "message": "Data already exists" });
+      //     } else {
+      //       const acId = crypto.randomUUID()
+      //       // let data = 
+      //       db.query('INSERT INTO collegebusemployee(collegeBusEmpId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus) VALUES (?, ?, ?,?,?,?,?,?,?)', [acId, name, collegeBusId, designationId, startDate, endDate, phono, empimg, currentStatus], (err, result) => {
+      //         // console.log(data)
+      //         if (err) {
+      //           res.status(400).send(err.message);
+      //         } else {
+      //           res.status(200).json({ "message": "Data inserted successfully" });
+      //         }
+      //       });
+      //     }
+      //   }
+      // });
     }
   });
 }

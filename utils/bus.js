@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 const addBus = (req, res, db) => {
-    const { busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, userId, busImage } = req.body;
+    const { busNo, routeNo, regDate, purchaseDate, startingPoint, noOfSeats, userId, busImage } = req.body;
     const acId = crypto.randomUUID()
     db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
         if (er) {
@@ -17,7 +17,7 @@ const addBus = (req, res, db) => {
                         console.log("Data already exists");
                         res.status(400).json({ "message": "Data already exists" });
                     } else {
-                        db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,endingPoint,noOfSeats,busImage) VALUES (?, ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, busImage], (err, result) => {
+                        db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,noOfSeats,busImage) VALUES ( ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, noOfSeats, busImage], (err, result) => {
                             if (err) {
                                 res.status(400).send(err.message);
                             } else {
