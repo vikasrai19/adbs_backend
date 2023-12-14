@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 14, 2023 at 10:16 AM
+-- Generation Time: Dec 14, 2023 at 11:37 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -33,6 +33,13 @@ CREATE TABLE `academicyear` (
   `orderNo` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `academicyear`
+--
+
+INSERT INTO `academicyear` (`academicyear_id`, `academicyear`, `orderNo`) VALUES
+('c9387f2c-6526-46bc-9205-668d546c3687', '2023-24', 9088);
+
 -- --------------------------------------------------------
 
 --
@@ -44,6 +51,13 @@ CREATE TABLE `boardingpoints` (
   `BoardingPointName` varchar(70) NOT NULL,
   `BoardingPointNO` int(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `boardingpoints`
+--
+
+INSERT INTO `boardingpoints` (`BoardingPointid`, `BoardingPointName`, `BoardingPointNO`) VALUES
+('a60da3f6-d5af-4aea-8f80-8d366fdb0323', 'Deralakatte', 1);
 
 -- --------------------------------------------------------
 
@@ -60,6 +74,13 @@ CREATE TABLE `busboardingpoints` (
   `dropTime` time NOT NULL,
   `orderNo` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `busboardingpoints`
+--
+
+INSERT INTO `busboardingpoints` (`busBoardingPointId`, `collegeBusId`, `academicyearId`, `boardingPointId`, `boardingTime`, `dropTime`, `orderNo`) VALUES
+('aad42c4d-f035-49c3-95f9-088c32b7c16b', '795879fb-c0c7-4582-b', 'c9387f2c-6526-46bc-9205-668d546c3687', 'a60da3f6-d5af-4aea-8f80-8d366fdb0323', '10:10:17', '15:12:15', 0);
 
 -- --------------------------------------------------------
 
@@ -79,6 +100,13 @@ CREATE TABLE `collegebus` (
   `busImage` varchar(1000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `collegebus`
+--
+
+INSERT INTO `collegebus` (`collegeBusId`, `busNo`, `routeNo`, `regDate`, `purchaseDate`, `startingPoint`, `endingPoint`, `noOfSeats`, `busImage`) VALUES
+('795879fb-c0c7-4582-b', '2', '5', '0000-00-00', '0000-00-00', 'a60da3f6-d5af-4aea-8f80-8d366fdb0323', 'goa', 47, '');
+
 -- --------------------------------------------------------
 
 --
@@ -94,6 +122,13 @@ CREATE TABLE `collegebusemployee` (
   `currentStatus` tinyint(1) NOT NULL,
   `userId` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `collegebusemployee`
+--
+
+INSERT INTO `collegebusemployee` (`collegeBusEmpId`, `collegeBusId`, `designationId`, `startDate`, `endDate`, `currentStatus`, `userId`) VALUES
+('51c2ac6f-08cd-4b9b-b6d7-c84b187d430d', '795879fb-c0c7-4582-b', 'b1832cb0c66246b493d72da60cd206d0', '0000-00-00', '0000-00-00', 0, '7a795826-53b3-409b-b582-2db9e4bf42e3');
 
 -- --------------------------------------------------------
 
@@ -175,6 +210,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`userId`, `name`, `mobileno`, `email`, `password`, `userImage`, `usertype_id`) VALUES
+('7a795826-53b3-409b-b582-2db9e4bf42e3', 'thor', '9740076467', 'thor@gmail.com', '2345', 'gh.png', '56d33d7538cd458b83e2279eefba4a1f'),
 ('nu23mca158', 'srujan', '97400764', 'srujan@gmail.com', '123456', '', '23ecf27394504c9583aebb614ba10510');
 
 -- --------------------------------------------------------
