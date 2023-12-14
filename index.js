@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cors = require('cors');
+require('dotenv').config();
 
 const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
@@ -27,9 +28,9 @@ const port = 3000;
 
 const db = mysql.createConnection({
   host: '127.0.0.1',
-  user: 'vikas',
-  password: 'vikasrai',
-  database: 'nittebuscheck'
+  user: process.env.DATABASE_USER,
+  password:process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME
 });
 
 db.connect((err) => {
