@@ -137,7 +137,7 @@ app.get('/web/api/student', (req, res) => {
 
 app.get('/web/api/driver', (req, res) => {
   const designationId = '56d33d7538cd458b83e2279eefba4a1f';
-  db.query('select * from users where usertype_id=? ', [designationId], (err, result, fields) => {
+  db.query('select * from users u, collegebusemployee cbe where cbe.userId = u.userId and u.usertype_id=? ', [designationId], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
