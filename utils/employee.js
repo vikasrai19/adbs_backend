@@ -43,7 +43,7 @@ const deleteBusEmployee = (req, res, db) => {
       res.status(400).json({ "message": "Invalid user" });
     } else {
       const userTypeDB = rows[0].designation_id;
-      const designationId='b1832cb0c66246b493d72da60cd206d0'
+      const designationId = 'b1832cb0c66246b493d72da60cd206d0'
 
       if (userTypeDB !== designationId) {
         res.status(400).json({ "message": "Invalid user type" });
@@ -97,4 +97,4 @@ const updateBusEmployee = (req, res) => {
 
 
 
-module.exports = { addBusEmployee, deleteBusEmployee,updateBusEmployee }
+module.exports = { addBusEmployee, deleteBusEmployee, updateBusEmployee }
