@@ -15,6 +15,7 @@ const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./util
 
 const { mobileLogin } = require('./utils/mobile_utils/mobile_login')
 const { mobileDashboardUser } = require('./utils/mobile_utils/mobile_dashboard')
+const { userProfile } = require('./utils/mobile_utils/profile')
 
 
 //const flash = require('connect-flash');
@@ -244,6 +245,8 @@ app.get('/web/api/designation', (req, res) => {
 app.post('/mobile/api/login', (req, res) => mobileLogin(req, res, db));
 
 app.get('/mobile/api/users/dashboard', (req, res) => mobileDashboardUser(req, res, db));
+
+app.get('/mobile/api/users/profile', (req, res) => userProfile(req, res, db));
 
 app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);
