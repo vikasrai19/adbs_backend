@@ -17,13 +17,14 @@ const addBus = (req, res, db) => {
                         console.log("Data already exists");
                         res.status(400).json({ "message": "Data already exists" });
                     } else {
-                        db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,noOfSeats,busImage) VALUES ( ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, noOfSeats, busImage], (err, result) => {
+                        result=db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,noOfSeats,busImage) VALUES ( ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, noOfSeats, busImage], (err, result) => {
                             if (err) {
                                 res.status(400).send(err.message);
                             } else {
                                 res.status(200).json({ "message": "Data inserted successfully" });
                             }
                         });
+                        console.log(result)
                     }
                 }
             });

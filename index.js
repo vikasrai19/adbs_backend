@@ -135,8 +135,8 @@ app.get('/web/api/student', (req, res) => {
 })
 
 app.get('/web/api/driver', (req, res) => {
-  const designationId = 'b1832cb0c66246b493d72da60cd206d0';
-  db.query('select * from collegebusemployee where designationId=?', [designationId], (err, result, fields) => {
+  const designationId = '56d33d7538cd458b83e2279eefba4a1f';
+  db.query('select * from users where usertype_id=? ', [designationId], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -234,6 +234,17 @@ app.get('/web/api/designation', (req, res) => {
   })
 })
 
+app.get('/web/api/usertype', (req, res) => {
+  db.query('select * from  usertype', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
 
 
 //end dashboard contents
