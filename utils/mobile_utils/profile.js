@@ -1,7 +1,6 @@
 const userProfile = (req, res, db) => {
 	const {userId} = req.query;
 	db.query('select * from users u, usertype ut, collegebususers cbu, busboardingpoints bpp, boardingpoints bp where bpp.busBoardingPointId = cbu.busBoardingPointId and bpp.boardingPointId = bp.boardingPointId and ut.usertype_id = u.usertype_id and cbu.user = u.userId and u.userId = ?', [userId], (err, rows) =>{
-
 		if(err){
 			res.status(400).json({'message': err?.message});
 		}else{
@@ -9,7 +8,6 @@ const userProfile = (req, res, db) => {
 				res.status(400).json({'message': 'Data not found'})
 			}else{
 				const data = rows[0];
-				console.log(data)
 				const retData = {
 					name: data?.name,
 					userId: data?.userId,

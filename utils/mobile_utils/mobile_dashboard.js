@@ -14,7 +14,6 @@ const mobileDashboardUser = (req, res, db) => {
                         res.status(400).json({'message': empErr.message});
                     }else{
                         driver = empRow[0];
-                        console.log(driver)
                         let retData = {
                             busNo: data?.busNo,
                             seatNo: data?.seatNo,
