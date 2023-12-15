@@ -281,3 +281,15 @@ app.listen(port, () => {
 //deletebus
 //updateemployee
 //update admin details
+
+app.get('/web/api/buseview', (req, res) => {
+  db.query('select s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
