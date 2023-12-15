@@ -283,7 +283,8 @@ app.listen(port, () => {
 //update admin details
 
 app.get('/web/api/buseview', (req, res) => {
-  db.query('select s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint', (err, result, fields) => {
+  const{collegeBusId}=req.body;
+  db.query('select c.collegeBusId, s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint and c.collegeBusId= ?', [collegeBusId],(err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -296,13 +297,15 @@ app.get('/web/api/buseview', (req, res) => {
 
 
 app.get('/web/api/empdetails', (req, res) => {
-  db.query('select c.collegeBusEmpId, u.name,u.mobileno, u.userImage, c.designationId from collegebusemployee c,users u where u.userId=c.userId', (err, result, fields) => {
+  const{collegeBusEmpId}=req.body;
+
+  db.query('SELECT c.collegeBusEmpId, u.name, u.mobileno, u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?', [collegeBusEmpId], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
-      })
+      });
     } else {
-      res.status(200).json(result)
+      res.status(200).json(result);
     }
-  })
-})
+  });
+});
