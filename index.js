@@ -16,7 +16,7 @@ const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./util
 const { mobileLogin } = require('./utils/mobile_utils/mobile_login')
 const { mobileDashboardUser } = require('./utils/mobile_utils/mobile_dashboard')
 const { userProfile } = require('./utils/mobile_utils/profile')
-const {busDetails} = require('./utils/mobile_utils/bus_details')
+const { busDetails } = require('./utils/mobile_utils/bus_details')
 
 
 //const flash = require('connect-flash');
@@ -31,7 +31,7 @@ const port = 3000;
 const db = mysql.createConnection({
   host: '127.0.0.1',
   user: process.env.DATABASE_USER,
-  password:process.env.DATABASE_PASSWORD,
+  password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME
 });
 
@@ -112,7 +112,7 @@ app.get('/web/api/boardingpoints', (req, res) => {
 })
 
 app.get('/web/api/busboardingpoints', (req, res) => {
-  db.query('select * from busboardingpoints', (err, result, fields) => {
+  db.query('select * from busboardingpoints bpp, boardingPoints bp where bp.boardingPointId = bpp.boardingPointId', (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,

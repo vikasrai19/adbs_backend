@@ -17,7 +17,7 @@ const addBus = (req, res, db) => {
                         console.log("Data already exists");
                         res.status(400).json({ "message": "Data already exists" });
                     } else {
-                        result=db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint,noOfSeats,busImage) VALUES ( ?, ?, ? , ? ,?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, noOfSeats, busImage], (err, result) => {
+                        result = db.query('INSERT INTO collegebus(collegeBusId,busNo,routeNo,regDate,purchaseDate,startingPoint, endingPoint,noOfSeats,busImage) VALUES ( ?, ?, ? , ? ,?, ?, ?, ?, ? )', [acId, busNo, routeNo, regDate, purchaseDate, startingPoint, '', noOfSeats, busImage], (err, result) => {
                             if (err) {
                                 res.status(400).send(err.message);
                             } else {
@@ -33,7 +33,7 @@ const addBus = (req, res, db) => {
 }
 
 const deleteBus = (req, res, db) => {
-    const {collegeBusId,userId} = req.body;
+    const { collegeBusId, userId } = req.body;
     const acId = crypto.randomUUID()
     db.query('select userId from Users u, usertype t where u.usertype_id = t.usertype_id and UserId=? and t.usertype = "Admin"', [userId], (er, rw, fl) => {
         if (er) {
@@ -42,19 +42,19 @@ const deleteBus = (req, res, db) => {
         if (rw.length === 0) {
             res.status(400).json({ "message": "Invalid user" });
         } else {
-            
-                        db.query('delete from collegebus where collegeBusId=?',[collegeBusId], (err, result) => {
-                            if (err) {
-                                res.status(400).send(err.message);
-                            } else {
-                                res.status(200).json({ "message": "Data deleted successfully" });
-                            }
-                        });
-                    }
+
+            db.query('delete from collegebus where collegeBusId=?', [collegeBusId], (err, result) => {
+                if (err) {
+                    res.status(400).send(err.message);
+                } else {
+                    res.status(200).json({ "message": "Data deleted successfully" });
                 }
-            );
+            });
         }
+    }
+    );
+}
 
 
-  
-module.exports = { addBus,deleteBus }
+
+module.exports = { addBus, deleteBus }
