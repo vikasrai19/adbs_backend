@@ -293,3 +293,16 @@ app.get('/web/api/buseview', (req, res) => {
     }
   })
 })
+
+
+app.get('/web/api/empdetails', (req, res) => {
+  db.query('select c.collegeBusEmpId, u.name,u.mobileno, u.userImage, c.designationId from collegebusemployee c,users u where u.userId=c.userId', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
