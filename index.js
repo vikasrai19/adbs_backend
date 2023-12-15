@@ -309,3 +309,34 @@ app.get('/web/api/empdetails', (req, res) => {
     }
   });
 });
+
+//userImage, name, email, mobileno, password, busNo, userId, usertype_id
+
+app.get('/web/api/studentdetails', (req, res) => {
+  const{userId}=req.body;
+
+  db.query('SELECT userId,name, mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ?', [userId], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+app.get('/web/api/admindetails', (req, res) => {
+  const{userId}=req.body;
+
+  db.query('SELECT userId,name,mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ? and usertype_id="23ecf27394504c9583aebb614ba10510"', [userId], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+

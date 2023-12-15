@@ -53,7 +53,7 @@ const addStudent = (req, res, db) => {
 }
 
 const updateStudent = (req, res, db) => {
-    const { userImage, name, email, mobileno, password, busNo, userId, usertype_id } = req.body;
+    const { userImage, name, email, mobileno, password, userId, usertype_id } = req.body;
 
     db.query('SELECT usertype_id FROM usertype WHERE usertype = "student"', (err, rows) => {
         if (err || rows.length === 0) {
@@ -65,8 +65,8 @@ const updateStudent = (req, res, db) => {
                 res.status(400).json({ "message": "Invalid user type" });
             } else {
                 db.query(
-                    'UPDATE users SET name=?, mobileno=?, busNo=?, email=?, password=?, userImage=? WHERE userId = ?',
-                    [name, mobileno, busNo, email, password, userImage, userId],
+                    'UPDATE users SET name=?, mobileno=?, email=?, password=?, userImage=? WHERE userId = ?',
+                    [name, mobileno, email, password, userImage, userId],
                     (stuErr, stuRow) => {
                         if (stuErr) {
                             res.status(400).json({ 'message': stuErr.message });
