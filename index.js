@@ -15,6 +15,8 @@ const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./util
 
 const { mobileLogin } = require('./utils/mobile_utils/mobile_login')
 const { mobileDashboardUser } = require('./utils/mobile_utils/mobile_dashboard')
+const { userProfile } = require('./utils/mobile_utils/profile')
+const { busDetails } = require('./utils/mobile_utils/bus_details')
 
 
 //const flash = require('connect-flash');
@@ -29,7 +31,7 @@ const port = 3000;
 const db = mysql.createConnection({
   host: '127.0.0.1',
   user: process.env.DATABASE_USER,
-  password:process.env.DATABASE_PASSWORD,
+  password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME
 });
 
@@ -109,6 +111,18 @@ app.get('/web/api/boardingpoints', (req, res) => {
   })
 })
 
+app.get('/web/api/busboardingpoints', (req, res) => {
+  db.query('select * from busboardingpoints bpp, boardingPoints bp where bp.boardingPointId = bpp.boardingPointId', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
+
 app.get('/web/api/colegebus', (req, res) => {
   db.query('select * from collegebus', (err, result, fields) => {
     if (err) {
@@ -135,8 +149,8 @@ app.get('/web/api/student', (req, res) => {
 })
 
 app.get('/web/api/driver', (req, res) => {
-  const designationId = 'b1832cb0c66246b493d72da60cd206d0';
-  db.query('select * from collegebusemployee where designationId=?', [designationId], (err, result, fields) => {
+  const designationId = '56d33d7538cd458b83e2279eefba4a1f';
+  db.query('select * from users u, collegebusemployee cbe where cbe.userId = u.userId and u.usertype_id=? ', [designationId], (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -234,8 +248,8 @@ app.get('/web/api/designation', (req, res) => {
   })
 })
 
-app.get('/web/api/buseview', (req, res) => {
-  db.query('select s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint', (err, result, fields) => {
+app.get('/web/api/usertype', (req, res) => {
+  db.query('select * from  usertype', (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,
@@ -255,6 +269,10 @@ app.get('/web/api/buseview', (req, res) => {
 app.post('/mobile/api/login', (req, res) => mobileLogin(req, res, db));
 
 app.get('/mobile/api/users/dashboard', (req, res) => mobileDashboardUser(req, res, db));
+
+app.get('/mobile/api/users/profile', (req, res) => userProfile(req, res, db));
+
+app.get('/mobile/api/users/busDetails', (req, res) => busDetails(req, res, db));
 
 app.listen(port, () => {
   console.log(`Application started running at http://localhost:${port}`);

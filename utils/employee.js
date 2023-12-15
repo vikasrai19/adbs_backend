@@ -81,6 +81,16 @@ const deleteBusEmployee = (req, res, db) => {
       const userTypeDB = rows[0].designation_id;
       const designationId = 'b1832cb0c66246b493d72da60cd206d0'
 
+      let empUserId;
+
+      db.query('select userId from collegebusemployee where collegeBusEmpId = ?', [collegeBusEmpId], (er, rw) => {
+        if(er){
+          res.status(400).json({message: er.message});
+        }else{
+          empUserId = rw[0]?.userId
+        }
+      })
+
       if (userTypeDB !== designationId) {
         res.status(400).json({ "message": "Invalid user type" });
       } else {
@@ -93,8 +103,15 @@ const deleteBusEmployee = (req, res, db) => {
             } else if (delResult.affectedRows === 0) {
               res.status(404).json({ 'message': 'college bus employee not found' });
             } else {
-              console.log('Student deleted successfully.');
-              res.status(200).json({ 'message': 'college bus employee deleted successfully.' });
+              db.query('delete from users where userId = ?', [empUserId], (userEr, userRow) => {
+                if(userEr){
+                  res.status(400).send({message: userEr.message});
+                }  else{
+                  console.log('Student deleted successfully.');
+                  res.status(200).json({ 'message': 'college bus employee deleted successfully.' });
+                }
+              })
+
             }
           }
         );
