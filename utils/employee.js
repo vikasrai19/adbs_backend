@@ -83,7 +83,7 @@ const deleteBusEmployee = (req, res, db) => {
 
       let empUserId;
 
-      db.query('select userId from collegebusesmployee where collegeBusEmpId = ?', [collegeBusEmpId], (er, rw) => {
+      db.query('select userId from collegebusemployee where collegeBusEmpId = ?', [collegeBusEmpId], (er, rw) => {
         if(er){
           res.status(400).json({message: er.message});
         }else{
