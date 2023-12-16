@@ -282,37 +282,60 @@ app.listen(port, () => {
 //updateemployee
 //update admin details
 
+
 app.get('/web/api/buseview', (req, res) => {
-  const{collegeBusId}=req.body;
-  db.query('select c.collegeBusId, s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint and c.collegeBusId= ?', [collegeBusId],(err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      })
-    } else {
-      res.status(200).json(result)
+  const { collegeBusId } = req.query;
+
+  if (!collegeBusId) {
+    return res.status(400).json({
+      'message': 'Missing collegeBusId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT c.collegeBusId, s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint AND c.collegeBusId = ?',
+    [collegeBusId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
     }
-  })
-})
+  );
+});
 
 
 app.get('/web/api/empdetails', (req, res) => {
-  const{collegeBusEmpId}=req.body;
+  const collegeBusEmpId = req.query.collegeBusEmpId;
 
-  db.query('SELECT c.collegeBusEmpId, u.name, u.mobileno, u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?', [collegeBusEmpId], (err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      });
-    } else {
-      res.status(200).json(result);
+  if (!collegeBusEmpId) {
+    return res.status(400).json({
+      'message': 'Missing collegeBusEmpId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT c.collegeBusEmpId, u.name, u.mobileno, u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?',
+    [collegeBusEmpId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
     }
-  });
+  );
 });
+
 
 //userImage, name, email, mobileno, password, busNo, userId, usertype_id
 
-app.get('/web/api/studentdetails', (req, res) => {
+app.get('/web/api/studentdetails1', (req, res) => {
   const{userId}=req.body;
 
   db.query('SELECT userId,name, mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ?', [userId], (err, result, fields) => {
@@ -326,17 +349,53 @@ app.get('/web/api/studentdetails', (req, res) => {
   });
 });
 
-app.get('/web/api/admindetails', (req, res) => {
-  const{userId}=req.body;
+app.get('/web/api/studentdetails', (req, res) => {
+  const userId = req.query.userId;
 
-  db.query('SELECT userId,name,mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ? and usertype_id="23ecf27394504c9583aebb614ba10510"', [userId], (err, result, fields) => {
-    if (err) {
-      res.status(400).json({
-        'message': err.message,
-      });
-    } else {
-      res.status(200).json(result);
+  if (!userId) {
+    return res.status(400).json({
+      'message': 'Missing userId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT userId, name, mobileno, email, password, userImage, usertype_id FROM users WHERE userId = ?',
+    [userId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
     }
-  });
+  );
 });
+
+
+app.get('/web/api/admindetails', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).json({
+      'message': 'Missing userId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT userId, name, mobileno, email, password, userImage, usertype_id FROM users WHERE userId = ? AND usertype_id = "23ecf27394504c9583aebb614ba10510"',
+    [userId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
 
