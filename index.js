@@ -139,7 +139,7 @@ app.get('/web/api/student', (req, res) => {
   const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
   db.query('select * from users where usertype_id=?', [studentUserType], (err, result, fields) => {
     if (err) {
-      res.status(400).json({
+      res.status(400).json({ 
         'message': err.message,
       })
     } else {
