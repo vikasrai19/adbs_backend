@@ -401,3 +401,14 @@ app.get('/web/api/admindetails', (req, res) => {
 });
 
 
+app.get('/web/api/dashboardBusData', (req, res) => {
+  db.query('SELECT c.collegeBusId,c.routeNo,c.regDate,c.purchaseDate,s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo,c.startingPoint,c.noOfSeats,c.busImage FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
