@@ -9,7 +9,7 @@ const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
-const { addBus, deleteBus } = require('./utils/bus')
+const { addBus, deleteBus,updateBus } = require('./utils/bus')
 const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
 const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./utils/employee')
 
@@ -57,6 +57,7 @@ app.post('/web/api/adddesignation', (req, res) => addDesignation(req, res, db));
 app.post('/web/api/addboarding', (req, res) => addBoarding(req, res, db));
 
 app.post('/web/api/addbus', (req, res) => addBus(req, res, db));
+app.post('/web/api/updateBus', (req, res) => updateBus(req, res, db));
 app.post('/web/api/addbusemployee', (req, res) => addBusEmployee(req, res, db));
 
 app.post('/web/api/dltstudent', (req, res) => deleteStudent(req, res, db));

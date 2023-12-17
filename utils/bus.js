@@ -32,6 +32,38 @@ const addBus = (req, res, db) => {
     });
 }
 
+const updateBus = (req, res, db) => {
+    const { collegeBusId, busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, busImage, userId } = req.body;
+  
+    db.query('SELECT userId FROM Users u, usertype t WHERE u.usertype_id = t.usertype_id AND UserId = ? AND t.usertype = "Admin"', [userId], (errUser, rowsUser, fieldsUser) => {
+      if (errUser) {
+        res.status(400).json({ "message": "Invalid user" });
+      } else if (rowsUser.length === 0) {
+        res.status(400).json({ "message": "Invalid user" });
+      } else {
+        db.query('SELECT * FROM collegebus WHERE collegeBusId = ?', [collegeBusId], (errSelect, rowsSelect) => {
+          if (errSelect) {
+            res.status(400).send(errSelect.message);
+          } else {
+            if (rowsSelect.length === 0) {
+              res.status(400).json({ "message": "Record not found" });
+            } else {
+              const updateQuery = 'UPDATE collegebus SET busNo = ?, routeNo = ?, regDate = ?, purchaseDate = ?, startingPoint = ?, endingPoint = ?, noOfSeats = ?, busImage = ? WHERE collegeBusId = ?';
+              db.query(updateQuery, [busNo, routeNo, regDate, purchaseDate, startingPoint, endingPoint, noOfSeats, busImage, collegeBusId], (errUpdate, resultUpdate) => {
+                if (errUpdate) {
+                  res.status(400).send(errUpdate.message);
+                } else {
+                  res.status(200).json({ "message": "Data updated successfully" });
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  };
+  
+
 const deleteBus = (req, res, db) => {
     const { collegeBusId, userId } = req.body;
     const acId = crypto.randomUUID()
@@ -57,4 +89,4 @@ const deleteBus = (req, res, db) => {
 
 
 
-module.exports = { addBus, deleteBus }
+module.exports = { addBus, deleteBus,updateBus }
