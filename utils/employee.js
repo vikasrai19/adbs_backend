@@ -98,30 +98,23 @@ const deleteBusEmployee = (req, res, db) => {
   });
 };
 
-
-
-
-const updateBusEmployee = (req, res, db) => {
-  const { userId, name, mobileno, email, password, userImage, designation_id, collegeBusEmpId } = req.body;
-
-
-  db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, desRows) => {
-    if (err || desRows.length === 0) {
-      res.status(400).json({ "message": "Invalid designation" });
+const updateBusEmployee = (req, res) => {
+  const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
+  db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
+    if (err || rows.length === 0) {
+      res.status(400).json({ "message": "Invalid user" });
     } else {
       const userTypeDB = desRows[0].designation_id;
 
       if (userTypeDB !== designation_id) {
         res.status(400).json({ "message": "Invalid designation" });
       } else {
-        db.query('SELECT collegeBusEmpId FROM collegebusemployee WHERE collegeBusEmpId = ?', [collegeBusEmpId], (err, empRows) => {
-          if (err || empRows.length === 0) {
-            res.status(400).json({ "message": "Invalid collegeBusEmpId" });
-          } else {
-            const userTypeDB = empRows[0].collegeBusEmpId;
-
-            if (userTypeDB !== collegeBusEmpId) {
-              res.status(400).json({ "message": "Invalid collegeBusEmpId" });
+        db.query(
+          'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
+          [name, phono, empimg, collegeBusEmpId],
+          (stuErr, stuRow) => {
+            if (stuErr) {
+              res.status(400).json({ 'message': stuErr.message });
             } else {
       
               db.query(
@@ -145,6 +138,7 @@ const updateBusEmployee = (req, res, db) => {
       }
     }
   });
+  console.log(req)
 };
 
 

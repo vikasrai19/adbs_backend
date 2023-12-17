@@ -292,8 +292,8 @@ app.get('/web/api/buseview', (req, res) => {
     });
   }
 
-  db.query(
-    'SELECT c.collegeBusId, s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint AND c.collegeBusId = ?',
+  boda=db.query(
+    'SELECT c.collegeBusId,c.routeNo,c.regDate,c.purchaseDate,s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo,c.startingPoint,c.noOfSeats,c.busImage FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint AND c.collegeBusId = ?',
     [collegeBusId],
     (err, result, fields) => {
       if (err) {
@@ -304,7 +304,8 @@ app.get('/web/api/buseview', (req, res) => {
         res.status(200).json(result);
       }
     }
-  );
+    );
+    console.log(boda)
 });
 
 
@@ -318,7 +319,7 @@ app.get('/web/api/empdetails', (req, res) => {
   }
 
   db.query(
-    'SELECT c.collegeBusEmpId, u.name, u.mobileno, u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?',
+    'SELECT c.collegeBusEmpId, u.name, u.mobileno,u.email,u.password,u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?',
     [collegeBusEmpId],
     (err, result, fields) => {
       if (err) {
