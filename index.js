@@ -9,7 +9,7 @@ const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
-const { addBus, deleteBus } = require('./utils/bus')
+const { addBus, deleteBus,updateBus } = require('./utils/bus')
 const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
 const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./utils/employee')
 
@@ -57,6 +57,7 @@ app.post('/web/api/adddesignation', (req, res) => addDesignation(req, res, db));
 app.post('/web/api/addboarding', (req, res) => addBoarding(req, res, db));
 
 app.post('/web/api/addbus', (req, res) => addBus(req, res, db));
+app.post('/web/api/updateBus', (req, res) => updateBus(req, res, db));
 app.post('/web/api/addbusemployee', (req, res) => addBusEmployee(req, res, db));
 
 app.post('/web/api/dltstudent', (req, res) => deleteStudent(req, res, db));
@@ -139,7 +140,7 @@ app.get('/web/api/student', (req, res) => {
   const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
   db.query('select * from users where usertype_id=?', [studentUserType], (err, result, fields) => {
     if (err) {
-      res.status(400).json({
+      res.status(400).json({ 
         'message': err.message,
       })
     } else {
@@ -282,8 +283,126 @@ app.listen(port, () => {
 //updateemployee
 //update admin details
 
+
 app.get('/web/api/buseview', (req, res) => {
-  db.query('select s.BoardingPointName,b.boardingTime,b.dropTime,c.busNo from boardingpoints s,busboardingpoints b,collegebus c where s.BoardingPointid=b.boardingPointId and s.BoardingPointid=c.startingPoint', (err, result, fields) => {
+  const { collegeBusId } = req.query;
+
+  if (!collegeBusId) {
+    return res.status(400).json({
+      'message': 'Missing collegeBusId parameter',
+    });
+  }
+
+  boda=db.query(
+    'SELECT c.collegeBusId,c.routeNo,c.regDate,c.purchaseDate,s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo,c.startingPoint,c.noOfSeats,c.busImage FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint AND c.collegeBusId = ?',
+    [collegeBusId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+    );
+    console.log(boda)
+});
+
+
+app.get('/web/api/empdetails', (req, res) => {
+  const collegeBusEmpId = req.query.collegeBusEmpId;
+
+  if (!collegeBusEmpId) {
+    return res.status(400).json({
+      'message': 'Missing collegeBusEmpId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT c.collegeBusEmpId, u.name, u.mobileno,u.email,u.password,u.userImage, c.designationId FROM collegebusemployee c, users u WHERE u.userId = c.userId AND c.collegeBusEmpId = ?',
+    [collegeBusEmpId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+
+//userImage, name, email, mobileno, password, busNo, userId, usertype_id
+
+app.get('/web/api/studentdetails1', (req, res) => {
+  const{userId}=req.body;
+
+  db.query('SELECT userId,name, mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ?', [userId], (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+app.get('/web/api/studentdetails', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).json({
+      'message': 'Missing userId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT userId, name, mobileno, email, password, userImage, usertype_id FROM users WHERE userId = ?',
+    [userId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+
+app.get('/web/api/admindetails', (req, res) => {
+  const userId = req.query.userId;
+
+  if (!userId) {
+    return res.status(400).json({
+      'message': 'Missing userId parameter',
+    });
+  }
+
+  db.query(
+    'SELECT userId, name, mobileno, email, password, userImage, usertype_id FROM users WHERE userId = ? AND usertype_id = "23ecf27394504c9583aebb614ba10510"',
+    [userId],
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).json({
+          'message': err.message,
+        });
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+
+app.get('/web/api/dashboardBusData', (req, res) => {
+  db.query('SELECT c.collegeBusId,c.routeNo,c.regDate,c.purchaseDate,s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo,c.startingPoint,c.noOfSeats,c.busImage FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint', (err, result, fields) => {
     if (err) {
       res.status(400).json({
         'message': err.message,

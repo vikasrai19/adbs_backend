@@ -43,33 +43,11 @@ const addBusEmployee = (req, res, db) => {
 
               }
 
-
             })
-
-      // db.query('SELECT * FROM  collegebusemployee  WHERE collegeBusId = ? OR phono = ?', [collegeBusId, phono], (err, rows) => {
-      //   if (err) {
-      //     res.status(400).send(err.message);
-      //   } else {
-      //     if (rows.length > 0) {
-      //       console.log("Data already exists");
-      //       res.status(400).json({ "message": "Data already exists" });
-      //     } else {
-      //       const acId = crypto.randomUUID()
-      //       // let data = 
-      //       db.query('INSERT INTO collegebusemployee(collegeBusEmpId,name,collegeBusId,designationId,startDate,endDate,phono,empimg,currentStatus) VALUES (?, ?, ?,?,?,?,?,?,?)', [acId, name, collegeBusId, designationId, startDate, endDate, phono, empimg, currentStatus], (err, result) => {
-      //         // console.log(data)
-      //         if (err) {
-      //           res.status(400).send(err.message);
-      //         } else {
-      //           res.status(200).json({ "message": "Data inserted successfully" });
-      //         }
-      //       });
-      //     }
-      //   }
-      // });
     }
   });
 }
+
 const deleteBusEmployee = (req, res, db) => {
   const { collegeBusEmpId, designationId } = req.body;
   console.log(collegeBusEmpId)
@@ -120,34 +98,51 @@ const deleteBusEmployee = (req, res, db) => {
   });
 };
 
-const updateBusEmployee = (req, res) => {
-  const { collegeBusEmpId, name, phono, empimg, designation_id } = req.body;
-  db.query('SELECT designation_id  FROM designation WHERE designation="driver"', (err, rows) => {
-    if (err || rows.length === 0) {
-      res.status(400).json({ "message": "Invalid user" });
+const updateBusEmployee = (req, res, db) => {
+  const { userId, name, mobileno, email, password, userImage, designation_id, collegeBusEmpId } = req.body;
+
+
+  db.query('SELECT designation_id FROM designation WHERE designation = "driver"', (err, desRows) => {
+    if (err || desRows.length === 0) {
+      res.status(400).json({ "message": "Invalid designation" });
     } else {
-      const userTypeDB = rows[0].designation_id;
+      const userTypeDB = desRows[0].designation_id;
 
       if (userTypeDB !== designation_id) {
-        res.status(400).json({ "message": "Invalid user type" });
+        res.status(400).json({ "message": "Invalid designation" });
       } else {
-        db.query(
-          'UPDATE collegebusemployee SET name=?, phono=?,empimg=? WHERE collegeBusEmpId  = ?',
-          [name, phono, empimg, collegeBusEmpId],
-          (stuErr, stuRow) => {
-            if (stuErr) {
-              res.status(400).json({ 'message': stuErr.message });
+        db.query('SELECT collegeBusEmpId FROM collegebusemployee WHERE collegeBusEmpId = ?', [collegeBusEmpId], (err, empRows) => {
+          if (err || empRows.length === 0) {
+            res.status(400).json({ "message": "Invalid collegeBusEmpId" });
+          } else {
+            const userTypeDB = empRows[0].collegeBusEmpId;
+
+            if (userTypeDB !== collegeBusEmpId) {
+              res.status(400).json({ "message": "Invalid collegeBusEmpId" });
             } else {
-              console.log('Student details updated successfully.');
-              res.status(200).json({ 'message': 'Student details updated successfully.' });
+      
+              db.query(
+                'UPDATE users SET name=?, mobileno=?, email=?, password=?, userImage=? WHERE userId=?',
+                [name, mobileno, email, password, userImage, userId],
+                (err, result) => {
+                  if (err) {
+                    res.status(400).json({ "message": err.message });
+                  } else {
+                    if (result.affectedRows > 0) {
+                      res.status(200).json({ "message": "Employee updated successfully" });
+                    } else {
+                      res.status(400).json({ "message": "Invalid userId or no changes made" });
+                    }
+                  }
+                }
+              );
             }
           }
-        );
+        });
       }
     }
   });
 };
-
 
 
 module.exports = { addBusEmployee, deleteBusEmployee, updateBusEmployee }
