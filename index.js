@@ -412,3 +412,14 @@ app.get('/web/api/dashboardBusData', (req, res) => {
     }
   })
 })
+app.get('/web/api/Busdata', (req, res) => {
+  db.query('SELECT * FROM collegebus ', (err, result, fields) => {
+    if (err) {
+      res.status(400).json({
+        'message': err.message,
+      })
+    } else {
+      res.status(200).json(result)
+    }
+  })
+})
