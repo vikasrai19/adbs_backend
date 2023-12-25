@@ -9,7 +9,7 @@ const login = require('./utils/login')
 const { createAcademicYear } = require('./utils/academic_year')
 const { addDesignation } = require('./utils/designation')
 const { addBoarding, addBusBoardingPoint } = require('./utils/boarding')
-const { addBus, deleteBus,updateBus } = require('./utils/bus')
+const { addBus, deleteBus, updateBus } = require('./utils/bus')
 const { addStudent, updateStudent, deleteStudent } = require('./utils/student')
 const { addBusEmployee, deleteBusEmployee, updateBusEmployee } = require('./utils/employee')
 
@@ -140,7 +140,7 @@ app.get('/web/api/student', (req, res) => {
   const studentUserType = '4317d1e47f6a45c39dacdad3b8c301f4';
   db.query('select * from users where usertype_id=?', [studentUserType], (err, result, fields) => {
     if (err) {
-      res.status(400).json({ 
+      res.status(400).json({
         'message': err.message,
       })
     } else {
@@ -293,7 +293,7 @@ app.get('/web/api/buseview', (req, res) => {
     });
   }
 
-  boda=db.query(
+  boda = db.query(
     'SELECT c.collegeBusId,c.routeNo,c.regDate,c.purchaseDate,s.BoardingPointName, b.boardingTime, b.dropTime, c.busNo,c.startingPoint,c.noOfSeats,c.busImage FROM boardingpoints s, busboardingpoints b, collegebus c WHERE s.BoardingPointid = b.boardingPointId AND s.BoardingPointid = c.startingPoint AND c.collegeBusId = ?',
     [collegeBusId],
     (err, result, fields) => {
@@ -305,8 +305,8 @@ app.get('/web/api/buseview', (req, res) => {
         res.status(200).json(result);
       }
     }
-    );
-    console.log(boda)
+  );
+  console.log(boda)
 });
 
 
@@ -338,7 +338,7 @@ app.get('/web/api/empdetails', (req, res) => {
 //userImage, name, email, mobileno, password, busNo, userId, usertype_id
 
 app.get('/web/api/studentdetails1', (req, res) => {
-  const{userId}=req.body;
+  const { userId } = req.body;
 
   db.query('SELECT userId,name, mobileno,email,password,userImage ,usertype_id  FROM users WHERE userId= ?', [userId], (err, result, fields) => {
     if (err) {
